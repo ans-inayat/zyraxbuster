@@ -133,14 +133,14 @@ pub fn list_available_wordlists() {
                             println!(
                                 "    {:<55} {}",
                                 sub_name,
-                                format!("{}", size_str).dimmed()
+                                size_str
                             );
                         }
                     }
                 } else {
                     let size = fs::metadata(file).map_or(0, |m| m.len());
                     let size_str = format_size(size);
-                    println!("  {:<55} {}", name, format!("{}", size_str).dimmed());
+                    println!("  {:<55} {}", name, size_str);
                 }
             }
         }
