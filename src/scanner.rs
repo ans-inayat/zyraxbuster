@@ -97,7 +97,7 @@ pub async fn run_scan(args: Args, url: String, candidates: Vec<String>) -> Vec<H
     let random_agent = args.random_agent;
     let delay = args.delay;
 
-    stream::iter(candidates.into_iter())
+    stream::iter(candidates)
         .for_each_concurrent(concurrency, |word| {
             let client = client.clone();
             let base = base.clone();

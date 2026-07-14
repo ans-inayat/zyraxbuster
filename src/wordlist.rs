@@ -41,7 +41,7 @@ pub fn auto_detect_wordlist() -> Option<String> {
 pub fn resolve_wordlist_path(input: &str) -> String {
     // Expand ~
     let expanded = if let Some(rest) = input.strip_prefix("~/") {
-        if let Some(home) = std::env::var("HOME").ok() {
+        if let Ok(home) = std::env::var("HOME") {
             format!("{}/{}", home, rest)
         } else {
             input.to_string()
@@ -95,7 +95,7 @@ pub fn list_available_wordlists() {
                 .filter(|e| {
                     let p = e.path();
                     p.extension()
-                        .map_or(false, |ext| ext == "txt" || ext == "lst")
+                    .is_some_and(|ext| ext == "txt" || ext == "lst")
                         || p.is_dir()
                 })
                 .map(|e| e.path())
@@ -119,7 +119,7 @@ pub fn list_available_wordlists() {
                             .filter(|e| {
                                 let p = e.path();
                                 p.extension()
-                                    .map_or(false, |ext| ext == "txt" || ext == "lst")
+                                    .is_some_and(|ext| ext == "txt" || ext == "lst")
                             })
                             .map(|e| e.path())
                             .collect();
