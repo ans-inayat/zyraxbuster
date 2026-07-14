@@ -94,7 +94,8 @@ pub fn list_available_wordlists() {
                 .filter_map(|e| e.ok())
                 .filter(|e| {
                     let p = e.path();
-                    p.extension().map_or(false, |ext| ext == "txt" || ext == "lst")
+                    p.extension()
+                        .map_or(false, |ext| ext == "txt" || ext == "lst")
                         || p.is_dir()
                 })
                 .map(|e| e.path())
@@ -117,7 +118,8 @@ pub fn list_available_wordlists() {
                             .filter_map(|e| e.ok())
                             .filter(|e| {
                                 let p = e.path();
-                                p.extension().map_or(false, |ext| ext == "txt" || ext == "lst")
+                                p.extension()
+                                    .map_or(false, |ext| ext == "txt" || ext == "lst")
                             })
                             .map(|e| e.path())
                             .collect();
@@ -130,11 +132,7 @@ pub fn list_available_wordlists() {
                                 .to_string();
                             let size = fs::metadata(sub).map_or(0, |m| m.len());
                             let size_str = format_size(size);
-                            println!(
-                                "    {:<55} {}",
-                                sub_name,
-                                size_str
-                            );
+                            println!("    {:<55} {}", sub_name, size_str);
                         }
                     }
                 } else {

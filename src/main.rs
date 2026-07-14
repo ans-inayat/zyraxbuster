@@ -77,7 +77,11 @@ async fn main() {
         println!("{} {}", "[+] Extensions:".bold(), ext);
     }
     if args.random_agent {
-        println!("{} {}", "[+] User-Agent:".bold(), "random (per request)".dimmed());
+        println!(
+            "{} {}",
+            "[+] User-Agent:".bold(),
+            "random (per request)".dimmed()
+        );
     } else {
         println!("{} {}", "[+] User-Agent:".bold(), args.user_agent);
     }
