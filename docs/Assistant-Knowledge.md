@@ -24,3 +24,19 @@ This file documents actions performed and recommended maintenance steps so the p
 - Run `cargo fmt` before committing to avoid CI failures.
 
 If you want, convert these docs into a wiki later or expand the docs with FAQs and troubleshooting steps.
+## FAQ
+
+- Q: Why did CI fail earlier?
+  A: Formatting (cargo fmt) and clippy warnings caused failures. Run `cargo fmt` and `cargo clippy` locally before pushing.
+
+- Q: How to trigger CI manually?
+  A: Push a commit or create an empty commit: `git commit --allow-empty -m "ci: trigger" && git push`.
+
+## Troubleshooting
+
+- If `cargo fmt` or `cargo clippy` are missing: `rustup component add rustfmt clippy`.
+- If CI reports new clippy lints, follow the suggestions from the clippy output (they are safe and idiomatic).
+
+## Contact / Maintenance
+
+Open issues or PRs for further changes. Keep the `dtolnay/rust-toolchain` action and rust toolchain version aligned.
