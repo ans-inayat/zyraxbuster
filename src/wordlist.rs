@@ -126,7 +126,8 @@ pub fn list_available_wordlists() {
                             let sub_name = sub
                                 .file_name()
                                 .unwrap_or_default()
-                                .to_string_lossy();
+                                .to_string_lossy()
+                                .to_string();
                             let size = fs::metadata(sub).map_or(0, |m| m.len());
                             let size_str = format_size(size);
                             println!(
