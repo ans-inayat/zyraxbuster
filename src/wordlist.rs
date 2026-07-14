@@ -95,7 +95,7 @@ pub fn list_available_wordlists() {
                 .filter(|e| {
                     let p = e.path();
                     p.extension()
-                    .is_some_and(|ext| ext == "txt" || ext == "lst")
+                        .is_some_and(|ext| ext == "txt" || ext == "lst")
                         || p.is_dir()
                 })
                 .map(|e| e.path())
