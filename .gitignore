@@ -1,0 +1,24 @@
+# Build artifacts
+/target
+*.exe
+*.pdb
+
+# Cargo
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test/Debug
+results.txt
+results.json
+*.log
+.mimocode/
