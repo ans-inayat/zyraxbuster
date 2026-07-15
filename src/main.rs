@@ -75,7 +75,11 @@ async fn main() {
         println!("{} {}", "[+] Extensions:".bold(), ext);
     }
     if args.random_agent {
-        println!("{} {}", "[+] User-Agent:".bold(), "random (per request)".dimmed());
+        println!(
+            "{} {}",
+            "[+] User-Agent:".bold(),
+            "random (per request)".dimmed()
+        );
     } else {
         println!("{} {}", "[+] User-Agent:".bold(), args.user_agent);
     }
@@ -107,7 +111,11 @@ async fn main() {
                     .unwrap_or("")
                     .to_string()
             });
-        println!("{} {}", "[+] Mode:".bold(), "VHost/Subdomain Fuzzing".bright_cyan());
+        println!(
+            "{} {}",
+            "[+] Mode:".bold(),
+            "VHost/Subdomain Fuzzing".bright_cyan()
+        );
         println!("{} {}", "[+] Domain:".bold(), host);
         host
     } else {
@@ -181,7 +189,11 @@ async fn main() {
                 println!("{} results written to {}", "[+]".green().bold(), path);
             }
             Err(e) => {
-                eprintln!("{} could not write output file: {}", "[!] Error:".red().bold(), e)
+                eprintln!(
+                    "{} could not write output file: {}",
+                    "[!] Error:".red().bold(),
+                    e
+                )
             }
         }
     }
