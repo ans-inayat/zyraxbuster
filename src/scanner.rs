@@ -228,3 +228,170 @@ fn print_hit(hit: &HitResult) {
         redirect_info.dimmed()
     );
 }
+
+fn print_vhost_hit(hit: &HitResult) {
+    let status_str = format!("{}", hit.status);
+    let colored_status = match hit.status {
+        200..=299 => status_str.green(),
+        300..=399 => status_str.yellow(),
+        400..=499 => status_str.red(),
+        500..=599 => status_str.magenta(),
+        _ => status_str.white(),
+    };
+
+    let redirect_info = hit
+        .redirect
+        .as_ref()
+        .map(|r| format!(" -> {}", r))
+        .unwrap_or_default();
+
+    println!(
+        "{:<55} [{}] [Size: {}]{}",
+        hit.url.cyan(),
+        colored_status,
+        hit.length,
+        redirect_info.dimmed()
+    );
+}
+
+/// Make a single baseline request to detect the default response size/status
+async fn make_baseline_request(client: &Client, url: &str) -> (StatusCode, u64) {
+    match client.get(url).send().await {
+        Ok(resp) => {
+            let status = resp.status();
+            let length = resp.content_length().unwrap_or(0);
+            (status, length)
+        }
+        Err(_) => (StatusCode::default(), 0),
+    }
+}
+
+/// VHost/subdomain fuzzing mode — fuzzes the Host header instead of URL path
+pub async fn run_vhost_scan(
+    args: Args,
+    url: String,
+    domain: String,
+    candidates: Vec<String>,
+) -> Vec<HitResult> {
+    let client = build_client(&args).expect("failed to build HTTP client");
+    let base = url.trim_end_matches('/').to_string();
+
+    let whitelist = args.status_codes.as_ref().map(|s| parse_code_set(s));
+    let blacklist = parse_code_set(&args.blacklist_codes);
+
+    // Auto-detect baseline if --auto-filter is enabled
+    let baseline = if args.auto_filter {
+        let (b_status, b_length) = make_baseline_request(&client, &base).await;
+        println!(
+            "{} baseline: {} [Size: {}]",
+            "[+] Baseline:".bold(),
+            b_status.as_u16(),
+            b_length
+        );
+        Some((b_status.as_u16(), b_length))
+    } else {
+        None
+    };
+
+    let pb = ProgressBar::new(candidates.len() as u64);
+    pb.set_style(
+        ProgressStyle::with_template(
+            "{spinner:.cyan} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta}) {msg}",
+        )
+        .unwrap()
+        .progress_chars("=>-"),
+    );
+
+    let results: Arc<Mutex<Vec<HitResult>>> = Arc::new(Mutex::new(Vec::new()));
+    let concurrency = args.threads.max(1);
+    let retries = args.retries;
+    let min_length = args.min_length;
+    let exclude_length = args.exclude_length;
+    let random_agent = args.random_agent;
+    let delay = args.delay;
+
+    stream::iter(candidates)
+        .for_each_concurrent(concurrency, |word| {
+            let client = client.clone();
+            let base = base.clone();
+            let domain = domain.clone();
+            let results = Arc::clone(&results);
+            let pb = pb.clone();
+            let whitelist = whitelist.clone();
+            let blacklist = blacklist.clone();
+            let baseline = baseline.clone();
+
+            async move {
+                if delay > 0 {
+                    tokio::time::sleep(Duration::from_millis(delay)).await;
+                }
+
+                let vhost = format!("{}.{}", word.trim(), domain);
+                let target = format!("{}/", base);
+
+                let mut attempt = 0;
+                let resp = loop {
+                    let mut req = client.get(&target);
+                    req = req.header(reqwest::header::HOST, &vhost);
+
+                    if random_agent {
+                        let agent = RANDOM_USER_AGENTS.choose(&mut rand::thread_rng());
+                        if let Some(a) = agent {
+                            req = req.header(reqwest::header::USER_AGENT, *a);
+                        }
+                    }
+
+                    match req.send().await {
+                        Ok(r) => break Some(r),
+                        Err(_e) if attempt < retries => {
+                            attempt += 1;
+                            continue;
+                        }
+                        Err(_) => break None,
+                    }
+                };
+
+                if let Some(resp) = resp {
+                    let status = resp.status();
+                    let redirect = resp
+                        .headers()
+                        .get(reqwest::header::LOCATION)
+                        .and_then(|v| v.to_str().ok())
+                        .map(|s| s.to_string());
+                    let length = resp.content_length().unwrap_or(0);
+
+                    // If auto_filter is on, skip responses matching baseline
+                    if let Some((b_status, b_length)) = baseline {
+                        if status.as_u16() == b_status && length == b_length {
+                            pb.inc(1);
+                            return;
+                        }
+                    }
+
+                    if should_report(
+                        status,
+                        &whitelist,
+                        &blacklist,
+                        length,
+                        min_length,
+                        exclude_length,
+                    ) {
+                        let hit = HitResult {
+                            url: vhost,
+                            status: status.as_u16(),
+                            length,
+                            redirect: redirect.clone(),
+                        };
+                        print_vhost_hit(&hit);
+                        results.lock().await.push(hit);
+                    }
+                }
+
+                pb.inc(1);
+            }
+        })
+        .await;
+
+    pb.finish_with_message("done");
+    Arc::try_unwrap(results).unwrap().into_inner()
+}

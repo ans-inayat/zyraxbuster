@@ -23,6 +23,8 @@ const WORDLIST_SEARCH_PATHS: &[&str] = &[
 const WORDLIST_SCAN_DIRS: &[&str] = &[
     "/usr/share/wordlists/seclists/Discovery/Web-Content",
     "/usr/share/seclists/Discovery/Web-Content",
+    "/usr/share/wordlists/seclists/Discovery/DNS",
+    "/usr/share/seclists/Discovery/DNS",
     "/usr/share/wordlists",
     "/usr/share/dirbuster/wordlists",
 ];

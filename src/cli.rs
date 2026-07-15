@@ -85,6 +85,14 @@ pub struct Args {
     #[arg(long, default_value_t = 0)]
     pub delay: u64,
 
+    /// Enable VHost/subdomain fuzzing mode (fuzzes the Host header)
+    #[arg(long, default_value_t = false)]
+    pub vhost: bool,
+
+    /// Auto-detect baseline and filter responses matching it (for VHost mode)
+    #[arg(long, default_value_t = false)]
+    pub auto_filter: bool,
+
     /// List available wordlists from common paths and exit
     #[arg(long, default_value_t = false)]
     pub list_wordlists: bool,

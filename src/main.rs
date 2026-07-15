@@ -89,6 +89,33 @@ async fn main() {
         "[+] Excluded status codes:".bold(),
         args.blacklist_codes
     );
+
+    // VHost mode info
+    let domain = if args.vhost {
+        let parsed = url::Url::parse(&url).ok();
+        let host = parsed
+            .as_ref()
+            .and_then(|u| u.host_str())
+            .map(|h| h.to_string())
+            .unwrap_or_else(|| {
+                // Fallback: strip protocol and path manually
+                url.trim_start_matches("http://")
+                    .trim_start_matches("https://")
+                    .split('/')
+                    .next()
+                    .unwrap_or("")
+                    .split(':')
+                    .next()
+                    .unwrap_or("")
+                    .to_string()
+            });
+        println!("{} {}", "[+] Mode:".bold(), "VHost/Subdomain Fuzzing".bright_cyan());
+        println!("{} {}", "[+] Domain:".bold(), host);
+        host
+    } else {
+        String::new()
+    };
+
     println!();
 
     let words = match wordlist::load_wordlist(&wordlist_path) {
@@ -118,7 +145,11 @@ async fn main() {
 
     let output_path = args.output.clone();
     let json_output = args.json;
-    let results = scanner::run_scan(args, url, candidates).await;
+    let results = if args.vhost {
+        scanner::run_vhost_scan(args, url, domain, candidates).await
+    } else {
+        scanner::run_scan(args, url, candidates).await
+    };
 
     println!(
         "\n{} scan complete, {} results found",
