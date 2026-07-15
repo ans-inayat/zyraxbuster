@@ -5,6 +5,28 @@ All notable changes to ZyraxBuster will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-15
+
+### Added
+
+- **VHost/Subdomain fuzzing mode** (`--vhost`)
+  - Fuzzes the HTTP Host header instead of URL path
+  - Discovers hidden subdomains and virtual hosts
+  - Shows discovered subdomains with status code and response size
+- **Auto-filter** (`--auto-filter`)
+  - Auto-detects baseline response (main domain)
+  - Filters out responses matching baseline (same status + same size)
+- **Subdomain wordlist support**
+  - Auto-detects subdomain wordlists from `/usr/share/wordlists/seclists/Discovery/DNS/`
+  - DNS directories listed in `--list-wordlists`
+
+### Changed
+
+- Updated banner to ASCII art
+- Wordlist (`-w`) is optional (auto-detects if omitted)
+
+---
+
 ## [0.1.0] - 2026-07-14
 
 ### Initial Release
