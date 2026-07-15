@@ -319,7 +319,7 @@ pub async fn run_vhost_scan(
             let pb = pb.clone();
             let whitelist = whitelist.clone();
             let blacklist = blacklist.clone();
-            let baseline = baseline.clone();
+            let baseline = baseline;
 
             async move {
                 if delay > 0 {
