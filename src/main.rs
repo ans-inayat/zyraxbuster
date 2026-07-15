@@ -9,13 +9,12 @@ use std::fs::File;
 use std::io::Write;
 
 const BANNER: &str = r#"
-███████╗██╗   ██╗██████╗  █████╗ ██╗  ██╗██████╗ ██╗   ██╗███████╗███████╗
-██╔════╝╚██╗ ██╔╝██╔══██╗██╔══██╗╚██╗██╔╝██╔══██╗██║   ██║██╔════╝╚══███╔╝
-█████╗   ╚████╔╝ ██████╔╝███████║ ╚███╔╝ ██████╔╝██║   ██║███████╗   ███╔╝
-██╔══╝    ╚██╔╝  ██╔══██╗██╔══██║ ██╔██╗ ██╔══██╗██║   ██║╚════██║   ███╔╝
-███████╗   ██║   ██║  ██║██║  ██║██╔╝ ██╗██████╔╝╚██████╔╝███████║   ██║
-╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝   ╚═╝
-
+ ____              _ ____               _ ____             _
+| __ ) _   _ _   _(_)  _ \ _ __ _____  / |__  / __ _ _ __ (_)__   ___  _ __
+|  _ \| | | | | | | | |_) | '__/ _ \ / /  / / / _` | '_ \| \ \ / / || '_ \
+| |_) | |_| | |_| | |  __/| | | (_) / /  / /_| (_| | | | | |\ V /| || |_) |
+|____/ \__, |\__,_|_|_|   |_|  \___/_/  /____|\__,_|_| |_|_| \_/  |_| .__/
+       |___/                                                         |_|
         fast async content discovery, written in Rust
         github.com/ans-inayat/zyraxbuster
 "#;
@@ -77,11 +76,7 @@ async fn main() {
         println!("{} {}", "[+] Extensions:".bold(), ext);
     }
     if args.random_agent {
-        println!(
-            "{} {}",
-            "[+] User-Agent:".bold(),
-            "random (per request)".dimmed()
-        );
+        println!("{} {}", "[+] User-Agent:".bold(), "random (per request)".dimmed());
     } else {
         println!("{} {}", "[+] User-Agent:".bold(), args.user_agent);
     }
@@ -156,11 +151,7 @@ async fn main() {
                 println!("{} results written to {}", "[+]".green().bold(), path);
             }
             Err(e) => {
-                eprintln!(
-                    "{} could not write output file: {}",
-                    "[!] Error:".red().bold(),
-                    e
-                )
+                eprintln!("{} could not write output file: {}", "[!] Error:".red().bold(), e)
             }
         }
     }
